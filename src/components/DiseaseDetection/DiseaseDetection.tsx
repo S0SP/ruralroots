@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Button, Card, CardContent, Typography, RadioGroup, FormControlLabel, Radio, CircularProgress, IconButton, Tabs, Tab, Alert, FormControl, InputLabel, Select, MenuItem, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { CloudUpload, Search, CameraAlt, Delete, CameraAltOutlined, Settings, FiberManualRecord } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
@@ -72,6 +72,13 @@ const DiseaseDetection: React.FC = () => {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [permissionState, setPermissionState] = useState<'prompt'|'granted'|'denied'>('prompt');
 
+  useEffect(() => {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+      console.error('Gemini API key not found in environment variables');
+      setError('API key not configured. Please check your environment setup.');
+    }
+  }, []);
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -104,7 +111,7 @@ const DiseaseDetection: React.FC = () => {
       return;
     }
 
-    if (!process.env.REACT_APP_GEMINI_API_KEY) {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
       setError('API key not configured. Please check your environment setup.');
       return;
     }
@@ -267,338 +274,358 @@ const DiseaseDetection: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3, marginTop: '27px' }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Disease Detection Tool
-      </Typography>
-      
-      <Typography variant="subtitle1" gutterBottom align="center" sx={{ mb: 3, color: 'text.secondary' }}>
-        Advanced Tools for Modern Farming
-      </Typography>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Plant Disease Detection
+          </h2>
+          <p className="mt-4 text-lg text-gray-500">
+            Upload a plant image to detect diseases and get treatment recommendations
+          </p>
+          {!import.meta.env.VITE_GEMINI_API_KEY && (
+            <div className="mt-4 p-4 bg-red-50 rounded-md">
+              <p className="text-red-700">
+                Warning: API key not configured. Some features may not work.
+              </p>
+            </div>
+          )}
+        </div>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
-            centered
-            sx={{
-              '& .MuiTabs-indicator': {
-                display: 'none',
-              },
-              '& .Mui-selected': {
-                color: '#4CAF50',
-                fontWeight: 'bold',
-              },
-              '& .MuiTab-root': {
-                borderBottom: tabValue === 0 ? '2px solid transparent' : (tabValue === 1 ? '2px solid transparent' : '2px solid transparent'),
-                '&.Mui-selected': {
-                  borderBottom: '2px solid #4CAF50',
-                }
-              }
-            }}
-          >
-            <Tab label="Upload" icon={<CloudUpload />} iconPosition="start" />
-            <Tab label="Camera" icon={<CameraAlt />} iconPosition="start" />
-          </Tabs>
-
-          {/* Hidden canvas for capturing images */}
-          <canvas ref={canvasRef} style={{ display: 'none' }} />
+        <Box sx={{ maxWidth: 800, mx: 'auto', p: 3, marginTop: '27px' }}>
+          <Typography variant="h4" gutterBottom align="center">
+            Disease Detection Tool
+          </Typography>
           
-          <Box
-            sx={{
-              border: '2px dotted #4CAF50',
-              borderRadius: 2,
-              p: 3,
-              textAlign: 'center',
-              minHeight: '350px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <TabPanel value={tabValue} index={0}>
-              {image ? (
-                <Box sx={{ position: 'relative', width: '100%', mx: 'auto' }}>
-                  <img
-                    src={image}
-                    alt="Uploaded"
-                    style={{ 
-                      width: '100%', 
-                      height: 'auto', 
-                      borderRadius: 8,
-                      maxHeight: '473px',
-                      objectFit: 'contain'
-                    }}
-                  />
-                  <IconButton
-                    sx={{ 
-                      position: 'absolute', 
-                      top: '8px', 
-                      right: '8px',
-                      backgroundColor: 'rgba(255,255,255,0.7)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.9)',
-                      }
-                    }}
-                    onClick={clearImage}
-                  >
-                    <Delete />
-                  </IconButton>
-                </Box>
-              ) : (
-                <Box 
-                  sx={{ 
-                    cursor: 'pointer',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                  />
-                  
-                  <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                  <Typography variant="h6">Upload Image</Typography>
-                  <Typography color="textSecondary">
-                    Click to upload an image of your crop, soil, or plant
-                  </Typography>
-                </Box>
-              )}
-            </TabPanel>
+          <Typography variant="subtitle1" gutterBottom align="center" sx={{ mb: 3, color: 'text.secondary' }}>
+            Advanced Tools for Modern Farming
+          </Typography>
 
-            <TabPanel value={tabValue} index={1}>
-              {image && !isCameraActive ? (
-                <Box sx={{ position: 'relative', width: '100%', mx: 'auto' }}>
-                  <img
-                    src={image}
-                    alt="Captured"
-                    style={{ 
-                      width: '100%', 
-                      height: 'auto', 
-                      borderRadius: 8,
-                      maxHeight: '473px',
-                      objectFit: 'contain'
-                    }}
-                  />
-                  <IconButton
-                    sx={{ 
-                      position: 'absolute', 
-                      top: '8px', 
-                      right: '8px',
-                      backgroundColor: 'rgba(255,255,255,0.7)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.9)',
-                      }
-                    }}
-                    onClick={clearImage}
-                  >
-                    <Delete />
-                  </IconButton>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    sx={{ mt: 2 }}
-                    onClick={() => {
-                      setImage(null);
-                      startCamera();
-                    }}
-                  >
-                    Take New Photo
-                  </Button>
-                </Box>
-              ) : (
-                <Box sx={{ position: 'relative', width: '100%', height: '280px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  {cameraError ? (
-                    <Box sx={{ textAlign: 'center', p: 2 }}>
-                      <CameraAltOutlined sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                      <Alert severity="warning" sx={{ mb: 2 }}>
-                        {cameraError}
-                      </Alert>
-                      <Typography variant="body2" sx={{ mb: 2 }}>
-                        You can still upload an image manually using the upload tab.
-                      </Typography>
-                      {permissionState === 'denied' && (
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          startIcon={<Settings />}
-                          onClick={() => {
-                            // Try to open browser settings if supported
-                            if (window.location.protocol === 'https:') {
-                              alert('Please update your camera permissions in your browser settings and then return to this page.');
-                            } else {
-                              alert('For camera access, this site needs to be accessed via HTTPS.');
-                            }
-                          }}
-                        >
-                          Update Permissions
-                        </Button>
-                      )}
-                    </Box>
-                  ) : (
-                    <>
-                      <video 
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Tabs 
+                value={tabValue} 
+                onChange={handleTabChange} 
+                centered
+                sx={{
+                  '& .MuiTabs-indicator': {
+                    display: 'none',
+                  },
+                  '& .Mui-selected': {
+                    color: '#4CAF50',
+                    fontWeight: 'bold',
+                  },
+                  '& .MuiTab-root': {
+                    borderBottom: tabValue === 0 ? '2px solid transparent' : (tabValue === 1 ? '2px solid transparent' : '2px solid transparent'),
+                    '&.Mui-selected': {
+                      borderBottom: '2px solid #4CAF50',
+                    }
+                  }
+                }}
+              >
+                <Tab label="Upload" icon={<CloudUpload />} iconPosition="start" />
+                <Tab label="Camera" icon={<CameraAlt />} iconPosition="start" />
+              </Tabs>
+
+              {/* Hidden canvas for capturing images */}
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+              
+              <Box
+                sx={{
+                  border: '2px dotted #4CAF50',
+                  borderRadius: 2,
+                  p: 3,
+                  textAlign: 'center',
+                  minHeight: '350px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <TabPanel value={tabValue} index={0}>
+                  {image ? (
+                    <Box sx={{ position: 'relative', width: '100%', mx: 'auto' }}>
+                      <img
+                        src={image}
+                        alt="Uploaded"
                         style={{ 
                           width: '100%', 
-                          height: '100%', 
-                          objectFit: 'cover',
-                          borderRadius: '8px'
+                          height: 'auto', 
+                          borderRadius: 8,
+                          maxHeight: '473px',
+                          objectFit: 'contain'
                         }}
                       />
-                      <Box 
+                      <IconButton
                         sx={{ 
                           position: 'absolute', 
-                          bottom: '16px', 
-                          left: '50%', 
-                          transform: 'translateX(-50%)',
-                          display: 'flex',
-                          gap: 2
+                          top: '8px', 
+                          right: '8px',
+                          backgroundColor: 'rgba(255,255,255,0.7)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.9)',
+                          }
+                        }}
+                        onClick={clearImage}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  ) : (
+                    <Box 
+                      sx={{ 
+                        cursor: 'pointer',
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                      />
+                      
+                      <CloudUpload sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                      <Typography variant="h6">Upload Image</Typography>
+                      <Typography color="textSecondary">
+                        Click to upload an image of your crop, soil, or plant
+                      </Typography>
+                    </Box>
+                  )}
+                </TabPanel>
+
+                <TabPanel value={tabValue} index={1}>
+                  {image && !isCameraActive ? (
+                    <Box sx={{ position: 'relative', width: '100%', mx: 'auto' }}>
+                      <img
+                        src={image}
+                        alt="Captured"
+                        style={{ 
+                          width: '100%', 
+                          height: 'auto', 
+                          borderRadius: 8,
+                          maxHeight: '473px',
+                          objectFit: 'contain'
+                        }}
+                      />
+                      <IconButton
+                        sx={{ 
+                          position: 'absolute', 
+                          top: '8px', 
+                          right: '8px',
+                          backgroundColor: 'rgba(255,255,255,0.7)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.9)',
+                          }
+                        }}
+                        onClick={clearImage}
+                      >
+                        <Delete />
+                      </IconButton>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        sx={{ mt: 2 }}
+                        onClick={() => {
+                          setImage(null);
+                          startCamera();
                         }}
                       >
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={captureImage}
-                          sx={{ borderRadius: '50%', minWidth: '60px', height: '60px' }}
-                        >
-                          <CameraAlt />
-                        </Button>
-                      </Box>
-                    </>
+                        Take New Photo
+                      </Button>
+                    </Box>
+                  ) : (
+                    <Box sx={{ position: 'relative', width: '100%', height: '280px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      {cameraError ? (
+                        <Box sx={{ textAlign: 'center', p: 2 }}>
+                          <CameraAltOutlined sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                          <Alert severity="warning" sx={{ mb: 2 }}>
+                            {cameraError}
+                          </Alert>
+                          <Typography variant="body2" sx={{ mb: 2 }}>
+                            You can still upload an image manually using the upload tab.
+                          </Typography>
+                          {permissionState === 'denied' && (
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              startIcon={<Settings />}
+                              onClick={() => {
+                                // Try to open browser settings if supported
+                                if (window.location.protocol === 'https:') {
+                                  alert('Please update your camera permissions in your browser settings and then return to this page.');
+                                } else {
+                                  alert('For camera access, this site needs to be accessed via HTTPS.');
+                                }
+                              }}
+                            >
+                              Update Permissions
+                            </Button>
+                          )}
+                        </Box>
+                      ) : (
+                        <>
+                          <video 
+                            ref={videoRef}
+                            autoPlay
+                            playsInline
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'cover',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Box 
+                            sx={{ 
+                              position: 'absolute', 
+                              bottom: '16px', 
+                              left: '50%', 
+                              transform: 'translateX(-50%)',
+                              display: 'flex',
+                              gap: 2
+                            }}
+                          >
+                            <Button
+                              variant="contained"
+                              color="success"
+                              onClick={captureImage}
+                              sx={{ borderRadius: '50%', minWidth: '60px', height: '60px' }}
+                            >
+                              <CameraAlt />
+                            </Button>
+                          </Box>
+                        </>
+                      )}
+                    </Box>
                   )}
-                </Box>
-              )}
-            </TabPanel>
-          </Box>
-        </CardContent>
-      </Card>
+                </TabPanel>
+              </Box>
+            </CardContent>
+          </Card>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Select what you're analyzing:
-          </Typography>
-          <RadioGroup value={selectedOption} onChange={handleOptionSelect}>
-            {['crop', 'soil', 'plant'].map((option) => (
-              <FormControlLabel
-                key={option}
-                value={option}
-                control={<Radio color="success" />}
-                label={option.charAt(0).toUpperCase() + option.slice(1)}
-              />
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
-
-      {error && (
-        <Alert 
-          severity="error" 
-          sx={{ mb: 3 }}
-          action={
-            <Button 
-              color="inherit" 
-              size="small"
-              onClick={() => {
-                console.log('Current environment:', {
-                  apiKeyExists: !!process.env.REACT_APP_GEMINI_API_KEY,
-                  selectedFileExists: !!selectedFile,
-                  selectedOption,
-                });
-              }}
-            >
-              Debug Info
-            </Button>
-          }
-        >
-          {error}
-        </Alert>
-      )}
-
-      <Box sx={{ textAlign: 'center', mb: 3 }}>
-        <Button
-          variant="contained"
-          size="large"
-          color="success"
-          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <Search />}
-          onClick={handleAnalyze}
-          disabled={!selectedFile || !selectedOption || isLoading}
-        >
-          {isLoading ? 'ANALYZING...' : 'ANALYZE IMAGE'}
-        </Button>
-      </Box>
-
-      {result && (
-        <ResultCard>
-          <Typography variant="h6" gutterBottom color="#000000" fontWeight={10}>
-            Analysis Results
-          </Typography>
-          
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
-              Disease Name & Type
-            </Typography>
-            <Typography sx={{ color: 'black', mb: 2 }}>
-              {result.diseaseName} {result.diseaseType && `- ${result.diseaseType}`}
-            </Typography>
-
-            <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
-              Reason
-            </Typography>
-            <Typography sx={{ color: 'black', mb: 2 }}>
-              {result.reason}
-            </Typography>
-
-            <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
-              Treatment Plan
-            </Typography>
-            <List>
-              {result.treatment.split('\n').map((step, index) => (
-                <ListItem key={index} sx={{ color: 'black', py: 0.5 }}>
-                  <ListItemIcon>
-                    <FiberManualRecord sx={{ color: 'black', fontSize: '8px' }} />
-                  </ListItemIcon>
-                  <ListItemText primary={step.trim()} sx={{ color: 'black' }} />
-                </ListItem>
-              ))}
-            </List>
-            {result.healTime && (
-              <Typography sx={{ color: 'black', mb: 2 }}>
-                Healing Time: {result.healTime}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Select what you're analyzing:
               </Typography>
-            )}
+              <RadioGroup value={selectedOption} onChange={handleOptionSelect}>
+                {['crop', 'soil', 'plant'].map((option) => (
+                  <FormControlLabel
+                    key={option}
+                    value={option}
+                    control={<Radio color="success" />}
+                    label={option.charAt(0).toUpperCase() + option.slice(1)}
+                  />
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
 
-            <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
-              Future Precautions
-            </Typography>
-            <List>
-              {result.precautions.map((precaution, index) => (
-                <ListItem key={index} sx={{ color: 'black', py: 0.5 }}>
-                  <ListItemIcon>
-                    <FiberManualRecord sx={{ color: 'black', fontSize: '8px' }} />
-                  </ListItemIcon>
-                  <ListItemText primary={precaution} sx={{ color: 'black' }} />
-                </ListItem>
-              ))}
-            </List>
+          {error && (
+            <Alert 
+              severity="error" 
+              sx={{ mb: 3 }}
+              action={
+                <Button 
+                  color="inherit" 
+                  size="small"
+                  onClick={() => {
+                    console.log('Current environment:', {
+                      apiKeyExists: !!import.meta.env.VITE_GEMINI_API_KEY,
+                      selectedFileExists: !!selectedFile,
+                      selectedOption,
+                    });
+                  }}
+                >
+                  Debug Info
+                </Button>
+              }
+            >
+              {error}
+            </Alert>
+          )}
+
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Button
+              variant="contained"
+              size="large"
+              color="success"
+              startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <Search />}
+              onClick={handleAnalyze}
+              disabled={!selectedFile || !selectedOption || isLoading}
+            >
+              {isLoading ? 'ANALYZING...' : 'ANALYZE IMAGE'}
+            </Button>
           </Box>
-        </ResultCard>
-      )}
-    </Box>
+
+          {result && (
+            <ResultCard>
+              <Typography variant="h6" gutterBottom color="#000000" fontWeight={10}>
+                Analysis Results
+              </Typography>
+              
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
+                  Disease Name & Type
+                </Typography>
+                <Typography sx={{ color: 'black', mb: 2 }}>
+                  {result.diseaseName} {result.diseaseType && `- ${result.diseaseType}`}
+                </Typography>
+
+                <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
+                  Reason
+                </Typography>
+                <Typography sx={{ color: 'black', mb: 2 }}>
+                  {result.reason}
+                </Typography>
+
+                <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
+                  Treatment Plan
+                </Typography>
+                <List>
+                  {result.treatment.split('\n').map((step, index) => (
+                    <ListItem key={index} sx={{ color: 'black', py: 0.5 }}>
+                      <ListItemIcon>
+                        <FiberManualRecord sx={{ color: 'black', fontSize: '8px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary={step.trim()} sx={{ color: 'black' }} />
+                    </ListItem>
+                  ))}
+                </List>
+                {result.healTime && (
+                  <Typography sx={{ color: 'black', mb: 2 }}>
+                    Healing Time: {result.healTime}
+                  </Typography>
+                )}
+
+                <Typography variant="h6" sx={{ color: '#8BC34A', mb: 1 }}>
+                  Future Precautions
+                </Typography>
+                <List>
+                  {result.precautions.map((precaution, index) => (
+                    <ListItem key={index} sx={{ color: 'black', py: 0.5 }}>
+                      <ListItemIcon>
+                        <FiberManualRecord sx={{ color: 'black', fontSize: '8px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary={precaution} sx={{ color: 'black' }} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </ResultCard>
+          )}
+        </Box>
+      </div>
+    </div>
   );
 };
 

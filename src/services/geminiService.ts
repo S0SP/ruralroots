@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai/dist/index.js';
 
 // Initialize the Gemini API with the API key from environment variables
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 console.log('API Key available:', !!API_KEY); // Debug log (will only show if key exists, not the key itself)
 
 const genAI = new GoogleGenerativeAI(API_KEY || '');
