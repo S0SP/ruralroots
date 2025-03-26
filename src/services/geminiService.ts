@@ -114,7 +114,7 @@ Important: Keep your response structured exactly as above and be consistent in y
     // Split by section headers
     const diseaseMatch = text.match(/Disease Name & Type:\s*([^\n]+)/);
     if (diseaseMatch) {
-      const [name, type] = diseaseMatch[1].split('-').map(s => s.trim());
+      const [name, type] = diseaseMatch[1].split('-').map((s: string) => s.trim());
       parsedResult.diseaseName = name;
       parsedResult.diseaseType = type || '';
     }
@@ -144,8 +144,8 @@ Important: Keep your response structured exactly as above and be consistent in y
       const precautionsText = precautionsMatch[1].trim();
       parsedResult.precautions = precautionsText
         .split(/(?:\r?\n|\r)/)
-        .map(line => line.replace(/^[-•*]\s*/, '').trim())
-        .filter(line => line.length > 0);
+        .map((line: string) => line.replace(/^[-•*]\s*/, '').trim())
+        .filter((line: string) => line.length > 0);
     }
 
     console.log('Parsed result:', parsedResult); // Debug log
