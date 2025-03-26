@@ -17,11 +17,11 @@ import { Notifications, Check, Error, Phone } from '@mui/icons-material';
 import smsService from '../../services/smsService';
 
 interface UserLocation {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
 }
 
-const SmsAlertCard: React.FC<{ userLocation: UserLocation }> = ({ userLocation }) => {
+const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLocation }) => {
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
