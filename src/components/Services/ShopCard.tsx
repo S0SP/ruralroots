@@ -18,6 +18,11 @@ interface Shop {
   coordinates: { lat: number; lng: number };
 }
 
+interface Location {
+  latitude: number;
+  longitude: number;
+}
+
 const StyledCard = styled(Card)`
   && {
     min-width: 300px;
@@ -115,6 +120,10 @@ const ShopCard: React.FC<ShopCardProps> = ({ location }) => {
     // Open Google Maps with the shop location
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${shop.coordinates.lat},${shop.coordinates.lng}`;
     window.open(mapsUrl, '_blank');
+  };
+
+  const fetchNearbyShops = async ({ location }: { location: Location }) => {
+    // ... rest of the code
   };
 
   return (
