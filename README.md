@@ -1,46 +1,60 @@
-# Getting Started with Create React App
+# Rural Roots - Farmer Assistance Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Rural Roots is a responsive web application designed to help farmers diagnose crop issues, check weather conditions for spraying, and gain expert agricultural guidance.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### 1. Header & Navigation
+- Logo in the top-left corner
+- Navigation menu with links to Business, Our Services, Schemes, and Pricing pages
+- Search and user profile icons
 
-### `npm start`
+### 2. Weather Forecast (Our Services Page)
+- Current weather data display with location, date, conditions, temperature, and rain probability
+- Spraying conditions indicator (favorable, moderate, unfavorable)
+- Hourly forecast showing optimal spraying times
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 3. Disease Detection Tool
+- Image upload functionality
+- Selection dropdown for crop/plant/soil type
+- Analysis results with disease name, type, reason, treatment, heal time, and future precautions
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Technical Details
 
-### `npm test`
+- Built with React and TypeScript
+- Styled using styled-components
+- Navigation handled with React Router
+- Weather data from OpenWeatherMap API
+- Responsive design for all screen sizes
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+3. Start the development server:
+   ```
+   npm start
+   ```
+4. Open http://localhost:3000 to view it in the browser
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## API Integration
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- The weather forecast feature uses the OpenWeatherMap API with key: `c2d1ebfac3b64219ba740601bcbd0eef`
+- The disease detection feature is currently using mock data, but can be integrated with an AI API like Google Cloud Vision or a custom backend
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Future Enhancements
 
-### `npm run eject`
+- Add authentication
+- Implement profile management
+- Add government scheme information
+- Integrate market prices
+- Add community forum for farmers
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Note
+This project requires actual image assets (logo and background image) to be added to the src/assets folder.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## License
+MIT
