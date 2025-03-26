@@ -3,7 +3,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -17,16 +17,20 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
       },
+      external: ['@google/generative-ai'],
       output: {
         manualChunks: undefined,
+        globals: {
+          '@google/generative-ai': 'GoogleGenerativeAI'
+        }
       },
     },
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
   server: {
