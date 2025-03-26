@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai/dist/index.js';
 
 // Initialize the Gemini API with the API key from environment variables
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;

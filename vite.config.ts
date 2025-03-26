@@ -19,18 +19,15 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
       },
-      external: ['@google/generative-ai'],
       output: {
         manualChunks: undefined,
-        globals: {
-          '@google/generative-ai': 'GoogleGenerativeAI'
-        }
       },
     },
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@google/generative-ai': fileURLToPath(new URL('./node_modules/@google/generative-ai', import.meta.url))
     },
   },
   server: {
