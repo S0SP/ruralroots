@@ -5,7 +5,6 @@ import Header from './components/Header/Header';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import Community from './pages/Community';
-import Contact from './pages/Contact';
 import DiseaseDetection from './components/DiseaseDetection/DiseaseDetection';
 import FarmDashboard from './pages/FarmDashboard';
 import Schemes from './pages/SchemesPage';
