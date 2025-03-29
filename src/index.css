@@ -2,6 +2,30 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.5;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+    100% {
+      opacity: 0.5;
+      transform: scale(0.8);
+    }
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
 }
 
 body {

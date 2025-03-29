@@ -7,6 +7,8 @@ import Services from './pages/Services';
 import Community from './pages/Community';
 import Contact from './pages/Contact';
 import DiseaseDetection from './components/DiseaseDetection/DiseaseDetection';
+import FarmDashboard from './pages/FarmDashboard';
+import Schemes from './pages/SchemesPage';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -35,9 +37,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
             <Route path="/community" element={<Community />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/business" element={<div>Business Page - Coming Soon</div>} />
-            <Route path="/schemes" element={<div>Schemes Page - Coming Soon</div>} />
+            <Route path="/FarmDashboard" element={<FarmDashboard />} />
+            <Route path="/SchemesPage" element={<Schemes />} />
             <Route path="/aitools" element={<AITools />} />
           </Routes>
         </ContentContainer>

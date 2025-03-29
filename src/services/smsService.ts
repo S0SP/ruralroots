@@ -20,7 +20,7 @@ export interface SmsSubscription {
 let mockSubscription: SmsSubscription | null = null;
 
 // Base API URL - update with your actual API endpoint
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_KEY = import.meta.env.VITE_SMS_API_KEY || '';
 
 /**
  * Send verification code to phone number

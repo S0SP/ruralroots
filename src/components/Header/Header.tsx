@@ -121,7 +121,7 @@ const IconWrapper = styled.div`
   }
 `;
 
-const pages = ['Home', 'Services', 'Community', 'Contact'];
+const pages = ['Home', 'Services', 'Community' ,'FarmDashboard' , 'SchemesPage'];
 
 const Header: React.FC = () => {
   return (
