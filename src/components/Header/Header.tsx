@@ -35,7 +35,7 @@ const LogoContainer = styled(Link)`
   display: flex;
   align-items: center;
   text-decoration: none;
-  margin-right: 10%;
+  margin-right: 25%;
   height: 100%;
   padding: 0;
 
