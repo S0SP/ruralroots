@@ -31,14 +31,17 @@ if (!API_BASE_URL) {
 export const sendVerificationCode = async (phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    const url = new URL('/.netlify/functions/api/sms/send-verification', API_BASE_URL).toString();
+    const url = new URL('/api/sms/send-verification', API_BASE_URL).toString();
     console.log(`Sending verification to: ${url}`);
     
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify({ phoneNumber }),
-      credentials: 'include'
+      credentials: 'same-origin'
     });
     
     console.log('Response status:', response.status);
@@ -70,7 +73,7 @@ export const sendVerificationCode = async (phoneNumber: string): Promise<{ succe
 };
 
 /**
- * Verify OTP and subscribe to SMS alerts
+ * Verify Otp and subscribe to SMS alerts
  */
 export const verifyOtpAndSubscribe = async (
   phoneNumber: string,
@@ -79,10 +82,12 @@ export const verifyOtpAndSubscribe = async (
 ): Promise<{ success: boolean; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sms/verify-and-subscribe`, {
+    const url = new URL('/.netlify/functions/api/sms/verify-and-subscribe', API_BASE_URL).toString();
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber, otp, location })
+      body: JSON.stringify({ phoneNumber, otp, location }),
+      credentials: 'include'
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to verify OTP' }));
@@ -105,7 +110,11 @@ export const verifyOtpAndSubscribe = async (
 export const getSubscriptionStatus = async (phoneNumber: string): Promise<{ subscribed: boolean; subscription?: SmsSubscription; error?: string }> => {
   if (!API_BASE_URL) return { subscribed: false, error: 'API URL not configured' };
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sms/subscription-status?phoneNumber=${encodeURIComponent(phoneNumber)}`);
+    const url = new URL('/.netlify/functions/api/sms/subscription-status', API_BASE_URL);
+    url.searchParams.append('phoneNumber', phoneNumber);
+    const response = await fetch(url.toString(), {
+      credentials: 'include'
+    });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to get subscription status' }));
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
@@ -124,10 +133,12 @@ export const getSubscriptionStatus = async (phoneNumber: string): Promise<{ subs
 export const unsubscribe = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    const response = await fetch(`${API_BASE_URL}/api/sms/unsubscribe`, {
+    const url = new URL('/.netlify/functions/api/sms/unsubscribe', API_BASE_URL).toString();
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber })
+      body: JSON.stringify({ phoneNumber }),
+      credentials: 'include'
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to unsubscribe' }));

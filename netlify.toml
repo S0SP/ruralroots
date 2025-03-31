@@ -1,31 +1,15 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions" # Specify the functions directory
+  functions = "netlify/functions"
 
-[build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "9"
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
 
-# Handle routing for single-page application
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Redirect API calls to the serverless function
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-
-# Add headers for security and caching
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Cache-Control = "public, max-age=0, must-revalidate"
