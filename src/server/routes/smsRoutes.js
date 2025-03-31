@@ -36,40 +36,24 @@ router.post('/send-verification', async (req, res) => {
       });
     }
     
-    // Create a verification (in production, use Twilio Verify API)
-    // For example:
-    // const verification = await twilioClient.verify.v2
-    //   .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-    //   .verifications.create({
-    //     to: phoneNumber,
-    //     channel: 'sms'
-    //   });
-    // 
-    // return res.json({ 
-    //   success: true, 
-    //   sid: verification.sid 
-    // });
-    
-    // For this example, we'll generate a random code and send it directly
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Store the code (in production, use a secure database with expiration)
+    // Use Twilio Verify API to send verification code
+    const verification = await twilioClient.verify.v2
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+      .verifications.create({
+        to: phoneNumber,
+        channel: 'sms'
+      });
+
+    // Store basic subscription info temporarily (still needs DB for production persistence)
     subscriptions.set(phoneNumber, {
-      verificationCode,
       createdAt: new Date(),
-      verified: false
+      verified: false, // Mark as unverified until OTP check
+      active: false
     });
-    
-    // Send the verification code via SMS
-    const message = await twilioClient.messages.create({
-      body: `Your verification code for farm weather alerts is: ${verificationCode}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: phoneNumber
-    });
-    
-    res.json({ 
-      success: true, 
-      sid: message.sid
+
+    res.json({
+      success: true,
+      sid: verification.sid // Return verification SID
     });
   } catch (error) {
     console.error('Error sending verification:', error);
@@ -97,51 +81,25 @@ router.post('/verify-and-subscribe', async (req, res) => {
       });
     }
     
-    // Verify the code
-    // For Twilio Verify API:
-    // const verification = await twilioClient.verify.v2
-    //   .services(process.env.TWILIO_VERIFY_SERVICE_SID)
-    //   .verificationChecks.create({
-    //     to: phoneNumber,
-    //     code: otp
-    //   });
-    //
-    // if (!verification.valid) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     error: 'Invalid verification code'
-    //   });
-    // }
-    
-    // For our example, check against stored code
-    const subscription = subscriptions.get(phoneNumber);
-    
-    if (!subscription) {
+    // Use Twilio Verify API to check the OTP
+    const verificationCheck = await twilioClient.verify.v2
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID)
+      .verificationChecks.create({
+        to: phoneNumber,
+        code: otp
+      });
+
+    if (verificationCheck.status !== 'approved') {
       return res.status(400).json({
         success: false,
-        error: 'No verification found for this number'
+        error: 'Invalid or expired verification code'
       });
     }
-    
-    if (subscription.verificationCode !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid verification code'
-      });
-    }
-    
-    // Check if code is expired (15 minutes)
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
-    if (subscription.createdAt < fifteenMinutesAgo) {
-      return res.status(400).json({
-        success: false,
-        error: 'Verification code has expired'
-      });
-    }
-    
-    // Update subscription with verified status and location
+
+    // OTP is valid, update subscription status (still using in-memory for now)
+    const existingSubscription = subscriptions.get(phoneNumber) || {};
     subscriptions.set(phoneNumber, {
-      ...subscription,
+      ...existingSubscription,
       verified: true,
       active: true,
       location,
@@ -341,4 +299,4 @@ router.post('/send-weather-alert', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

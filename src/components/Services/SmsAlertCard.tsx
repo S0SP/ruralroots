@@ -92,7 +92,7 @@ const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLoc
     setPhoneNumber(value);
     
     if (value && !validatePhoneNumber(value)) {
-      setPhoneError('Please enter a valid phone number (e.g., +1234567890)');
+      setPhoneError('Please enter a valid phone number (e.g., 918100154434)');
     } else {
       setPhoneError(null);
     }

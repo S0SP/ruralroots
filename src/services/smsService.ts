@@ -16,34 +16,30 @@ export interface SmsSubscription {
   createdAt: Date;
 }
 
-// Mock storage for development/demo purposes
-let mockSubscription: SmsSubscription | null = null;
+// Base API URL from environment variable
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// Base API URL - update with your actual API endpoint
-const API_KEY = import.meta.env.VITE_SMS_API_KEY || '';
+if (!API_BASE_URL) {
+  console.error("Error: VITE_API_URL environment variable is not set.");
+}
 
 /**
  * Send verification code to phone number
  */
 export const sendVerificationCode = async (phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> => {
+  if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    // For production, you would make an actual API call:
-    // const response = await fetch(`${API_URL}/sms/send-verification`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ phoneNumber })
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Mock implementation for development
-    console.log(`[Mock] Sending verification code to ${phoneNumber}`);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-    
-    return { 
-      success: true,
-      sid: `VE${Math.random().toString(36).substring(2, 10)}` 
-    };
+    const response = await fetch(`${API_BASE_URL}/api/sms/send-verification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to send verification code' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error sending verification code:', error);
     return { 
@@ -57,41 +53,23 @@ export const sendVerificationCode = async (phoneNumber: string): Promise<{ succe
  * Verify OTP and subscribe to SMS alerts
  */
 export const verifyOtpAndSubscribe = async (
-  phoneNumber: string, 
+  phoneNumber: string,
   otp: string,
   location: { lat: number; lng: number }
 ): Promise<{ success: boolean; error?: string }> => {
+  if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    // For production, you would make an actual API call:
-    // const response = await fetch(`${API_URL}/sms/verify-and-subscribe`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ phoneNumber, otp, location })
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Mock implementation for development
-    console.log(`[Mock] Verifying OTP ${otp} for ${phoneNumber} at location ${location.lat},${location.lng}`);
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-    
-    // In mock mode, any 6-digit OTP is valid
-    if (otp.length !== 6 || !/^\d+$/.test(otp)) {
-      return { success: false, error: 'Invalid verification code' };
+    const response = await fetch(`${API_BASE_URL}/api/sms/verify-and-subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber, otp, location })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to verify OTP' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
-    
-    // Store subscription
-    mockSubscription = {
-      phoneNumber,
-      location,
-      active: true,
-      createdAt: new Date()
-    };
-    
-    // Log mock subscription
-    console.log('[Mock] Created subscription:', mockSubscription);
-    
-    return { success: true };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error verifying OTP:', error);
     return { 
@@ -104,24 +82,16 @@ export const verifyOtpAndSubscribe = async (
 /**
  * Get current subscription status
  */
-export const getSubscriptionStatus = async (phoneNumber: string): Promise<{ subscribed: boolean; subscription?: SmsSubscription }> => {
+export const getSubscriptionStatus = async (phoneNumber: string): Promise<{ subscribed: boolean; subscription?: SmsSubscription; error?: string }> => {
+  if (!API_BASE_URL) return { subscribed: false, error: 'API URL not configured' };
   try {
-    // For production, you would make an actual API call:
-    // const response = await fetch(`${API_URL}/sms/subscription-status?phoneNumber=${encodeURIComponent(phoneNumber)}`);
-    // const data = await response.json();
-    // return data;
-
-    // Mock implementation for development
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-    
-    if (mockSubscription && mockSubscription.phoneNumber === phoneNumber) {
-      return { 
-        subscribed: true,
-        subscription: mockSubscription
-      };
+    const response = await fetch(`${API_BASE_URL}/api/sms/subscription-status?phoneNumber=${encodeURIComponent(phoneNumber)}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to get subscription status' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
-    
-    return { subscribed: false };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error checking subscription status:', error);
     return { subscribed: false };
@@ -132,26 +102,19 @@ export const getSubscriptionStatus = async (phoneNumber: string): Promise<{ subs
  * Unsubscribe from SMS alerts
  */
 export const unsubscribe = async (phoneNumber: string): Promise<{ success: boolean; error?: string }> => {
+  if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    // For production, you would make an actual API call:
-    // const response = await fetch(`${API_URL}/sms/unsubscribe`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ phoneNumber })
-    // });
-    // const data = await response.json();
-    // return data;
-
-    // Mock implementation for development
-    console.log(`[Mock] Unsubscribing ${phoneNumber} from alerts`);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-    
-    if (mockSubscription && mockSubscription.phoneNumber === phoneNumber) {
-      mockSubscription.active = false;
-      return { success: true };
+    const response = await fetch(`${API_BASE_URL}/api/sms/unsubscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber })
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to unsubscribe' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
-    
-    return { success: false, error: 'No active subscription found' };
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error unsubscribing:', error);
     return { 
@@ -167,4 +130,4 @@ export default {
   verifyOtpAndSubscribe,
   getSubscriptionStatus,
   unsubscribe
-}; 
+};

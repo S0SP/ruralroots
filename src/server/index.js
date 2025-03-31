@@ -25,7 +25,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+// Configure CORS to allow requests only from the Netlify frontend
+app.use(cors({
+  origin: 'https://ubiquitous-valkyrie-390790.netlify.app'
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -65,4 +68,4 @@ app.listen(PORT, () => {
   }
 });
 
-module.exports = app; 
+module.exports = app;

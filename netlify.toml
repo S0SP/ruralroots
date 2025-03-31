@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions" # Specify the functions directory
 
 [build.environment]
   NODE_VERSION = "18"
@@ -12,6 +13,12 @@
   to = "/index.html"
   status = 200
 
+# Redirect API calls to the serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
 # Add headers for security and caching
 [[headers]]
   for = "/*"
@@ -20,4 +27,4 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Cache-Control = "public, max-age=0, must-revalidate" 
+    Cache-Control = "public, max-age=0, must-revalidate"
