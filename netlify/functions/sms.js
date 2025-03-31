@@ -3,19 +3,25 @@ const serverless = require('serverless-http');
 const cors = require('cors');
 const twilio = require('twilio');
 
-
-// Add initial startup logging
 console.log('Function initialization started');
 
 const app = express();
 
 // Add middleware logging
 app.use((req, res, next) => {
-  console.log('Request received:', {
+  // Parse the Buffer body
+  if (req.body instanceof Buffer) {
+    try {
+      req.body = JSON.parse(req.body.toString());
+    } catch (e) {
+      console.error('Failed to parse body:', e);
+    }
+  }
+  
+  console.log('Parsed request:', {
     method: req.method,
     path: req.path,
-    body: req.body,
-    headers: req.headers
+    body: req.body
   });
   next();
 });
@@ -27,11 +33,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.post('/send-verification', async (req, res) => {
-  console.log('Verification endpoint hit:', {
-    body: req.body,
-    phoneNumber: req.body?.phoneNumber
-  });
+// Update the path to match the incoming request
+app.post('/.netlify/functions/sms/send-verification', async (req, res) => {
+  console.log('Verification endpoint hit with body:', req.body);
   
   try {
     const { phoneNumber } = req.body;
@@ -40,6 +44,7 @@ app.post('/send-verification', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Phone number is required' });
     }
 
+    console.log('Processing phone number:', phoneNumber);
     console.log('Twilio credentials check:', {
       hasSID: !!process.env.TWILIO_ACCOUNT_SID,
       hasToken: !!process.env.TWILIO_AUTH_TOKEN,
@@ -67,17 +72,6 @@ app.post('/send-verification', async (req, res) => {
     });
     res.status(500).json({ success: false, error: error.message });
   }
-});
-
-app.get('/', (req, res) => {
-  console.log('Health check endpoint hit');
-  res.json({ message: 'SMS API is working' });
-});
-
-// Add error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).json({ error: 'Internal server error' });
 });
 
 console.log('Function initialization completed');
