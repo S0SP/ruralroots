@@ -29,22 +29,40 @@ if (!API_BASE_URL) {
 export const sendVerificationCode = async (phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
+    console.log(`Sending verification to: ${API_BASE_URL}/api/sms/send-verification`);
+    
     const response = await fetch(`${API_BASE_URL}/api/sms/send-verification`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber })
+      body: JSON.stringify({ phoneNumber }),
+      // Add credentials if you're using cookies
+      credentials: 'include'
     });
+    
+    console.log('Response status:', response.status);
+    
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Failed to send verification code' }));
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { error: `Failed with status: ${response.status}` };
+      }
+      
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
+    
     const data = await response.json();
+    console.log('Success response:', data);
     return data;
   } catch (error) {
     console.error('Error sending verification code:', error);
     return { 
       success: false, 
-      error: 'Failed to send verification code. Please try again.' 
+      error: error instanceof Error ? error.message : 'Failed to send verification code. Please try again.' 
     };
   }
 };
