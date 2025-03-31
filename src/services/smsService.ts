@@ -19,6 +19,8 @@ export interface SmsSubscription {
 // Base API URL from environment variable
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+console.log('API_BASE_URL value:', API_BASE_URL); // Add this to debug
+
 if (!API_BASE_URL) {
   console.error("Error: VITE_API_URL environment variable is not set.");
 }
@@ -29,13 +31,14 @@ if (!API_BASE_URL) {
 export const sendVerificationCode = async (phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    console.log(`Sending verification to: ${API_BASE_URL}/api/sms/send-verification`);
+    // Fix the URL construction to ensure it's properly formatted
+    const url = new URL('/api/sms/send-verification', API_BASE_URL).toString();
+    console.log(`Sending verification to: ${url}`);
     
-    const response = await fetch(`${API_BASE_URL}/api/sms/send-verification`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phoneNumber }),
-      // Add credentials if you're using cookies
       credentials: 'include'
     });
     
