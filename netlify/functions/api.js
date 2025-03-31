@@ -26,12 +26,6 @@ app.post('/send-verification', async (req, res) => {
       });
     }
 
-    console.log('Twilio credentials:', {
-      accountSid: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not set',
-      authToken: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not set',
-      serviceSid: process.env.TWILIO_VERIFICATION_SERVICE_SID ? 'Set' : 'Not set'
-    });
-
     const client = twilio(
       process.env.TWILIO_ACCOUNT_SID,
       process.env.TWILIO_AUTH_TOKEN
