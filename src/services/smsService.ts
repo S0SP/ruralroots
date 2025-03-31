@@ -32,7 +32,7 @@ export const sendVerificationCode = async (phoneNumber: string): Promise<{ succe
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
     // In sendVerificationCode function
-    const url = new URL('/.netlify/functions/api/send-verification', API_BASE_URL.replace(/\/$/, '')).toString();
+    const url = new URL('/.netlify/functions/sms/send-verification', API_BASE_URL.replace(/\/$/, '')).toString();
     console.log(`Sending verification to: ${url}`);
     
     const response = await fetch(url, {
