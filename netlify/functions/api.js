@@ -1,16 +1,34 @@
-// netlify/functions/api.js
+const express = require('express');
 const serverless = require('serverless-http');
-// Adjust the path based on your project structure to import the Express app
-// Assuming netlify/functions is at the root level alongside src/
-const app = require('../../src/server/index');
+const cors = require('cors');
+const app = express();
 
-// Wrap the app with serverless-http
-const handler = serverless(app);
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Export the handler for Netlify
-module.exports.handler = async (event, context) => {
-  // You can add custom logic here before or after the handler runs if needed
-  const result = await handler(event, context);
-  // You can add custom logic here based on the result if needed
-  return result;
-};
+// SMS verification endpoint
+app.post('/sms/send-verification', async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+    const client = require('twilio')(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
+
+    const verification = await client.verify.v2
+      .services(process.env.TWILIO_VERIFICATION_SERVICE_SID)
+      .verifications.create({ to: phoneNumber, channel: 'sms' });
+
+    res.json({ success: true, sid: verification.sid });
+  } catch (error) {
+    console.error('Twilio error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || 'Failed to send verification code' 
+    });
+  }
+});
+
+// Export the serverless function
+module.exports.handler = serverless(app);
