@@ -15,7 +15,7 @@ import { getWeatherData } from '../services/weatherService';
 
 const PageContainer = styled(Container)`
   && {
-    padding-top: 30px;
+    padding-top: 95px;
     padding-bottom: 4rem;
   }
 `;

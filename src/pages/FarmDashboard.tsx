@@ -1127,7 +1127,7 @@ const FarmDashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px', marginTop:'35px' , marginBottom:'90px' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px', marginTop:'60px' , marginBottom:'90px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#2e7d32' }}>Farm Management Dashboard</h1>
         <a href="/schemes" style={{ textDecoration: 'none' }}>

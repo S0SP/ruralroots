@@ -508,7 +508,7 @@ const Community: React.FC = () => {
 
   return (
     <MainContainer>
-      <Box sx={{ maxWidth: 800, mx: 'auto', marginTop: '27px' }}>
+      <Box sx={{ maxWidth: 800, mx: 'auto', marginTop: '60px' }}>
         <Typography 
           variant="h4" 
           gutterBottom 

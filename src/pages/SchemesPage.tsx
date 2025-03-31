@@ -238,7 +238,7 @@ const SchemesPage: React.FC = () => {
   }, [searchQuery, activeCategory])
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" ,  marginTop:'35px' }}>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" ,  marginTop:'60px' }}>
       <div style={{ display: "flex", alignItems: "center", marginBottom: "32px" }}>
         <a href="/" style={{ textDecoration: "none" }}>
           <button
