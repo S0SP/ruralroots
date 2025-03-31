@@ -1,9 +1,10 @@
 const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
+const twilio = require('twilio');
+
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -11,7 +12,14 @@ app.use(express.json());
 app.post('/sms/send-verification', async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-    const client = require('twilio')(
+    if (!phoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Phone number is required' 
+      });
+    }
+
+    const client = twilio(
       process.env.TWILIO_ACCOUNT_SID,
       process.env.TWILIO_AUTH_TOKEN
     );
@@ -20,12 +28,15 @@ app.post('/sms/send-verification', async (req, res) => {
       .services(process.env.TWILIO_VERIFICATION_SERVICE_SID)
       .verifications.create({ to: phoneNumber, channel: 'sms' });
 
-    res.json({ success: true, sid: verification.sid });
+    res.json({
+      success: true,
+      sid: verification.sid
+    });
   } catch (error) {
     console.error('Twilio error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to send verification code' 
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to send verification code'
     });
   }
 });
