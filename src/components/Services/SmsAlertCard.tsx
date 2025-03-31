@@ -129,23 +129,16 @@ const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLoc
     }
   };
 
+  // Update the verifyOtpAndSubscribe call
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
-      setError('Please enter a valid 6-digit verification code');
-      return;
-    }
-
-    if (!userLocation) {
-      setError('Location data is unavailable. Please enable location services.');
-      return;
-    }
-
     try {
-      setLoading(true);
-      setError(null);
-      
-      const result = await smsService.verifyOtpAndSubscribe(phoneNumber, otp, userLocation);
-      
+      const result = await verifyOtpAndSubscribe(
+        phoneNumber,
+        otp,
+        location,
+        user?.uid // Add the user ID as the fourth argument
+      );
+    
       if (result.success) {
         setSubscribed(true);
         setShowOtpField(false);
@@ -290,4 +283,4 @@ const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLoc
   );
 };
 
-export default SmsAlertCard; 
+export default SmsAlertCard;

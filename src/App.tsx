@@ -9,7 +9,7 @@ import DiseaseDetection from './components/DiseaseDetection/DiseaseDetection';
 import FarmDashboard from './pages/FarmDashboard';
 import Schemes from './pages/SchemesPage';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const AppContainer = styled.div`
   min-height: 100vh;
