@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Notifications, Check, Error, Phone } from '@mui/icons-material';
 import smsService from '../../services/smsService';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface UserLocation {
   lat: number;
@@ -22,6 +23,9 @@ interface UserLocation {
 }
 
 const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLocation }) => {
+  // Add this line near other state declarations
+  const { user } = useAuth();
+  
   const [alertsEnabled, setAlertsEnabled] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -129,27 +133,41 @@ const SmsAlertCard: React.FC<{ userLocation: UserLocation | null }> = ({ userLoc
     }
   };
 
-  // Update the verifyOtpAndSubscribe call
   const handleVerifyOtp = async () => {
+    if (!phoneNumber || !otp || !userLocation || !user?.uid) {
+      setError('Please provide all required information and ensure you are logged in');
+      return;
+    }
+
     try {
-      const result = await verifyOtpAndSubscribe(
+      setLoading(true);
+      setError(null);
+      
+      const result = await smsService.verifyOtpAndSubscribe(
         phoneNumber,
         otp,
-        location,
-        user?.uid // Add the user ID as the fourth argument
+        {
+          lat: userLocation.lat,
+          lng: userLocation.lng
+        },
+        user.uid  // Add the user ID as the fourth argument
       );
-    
+      
       if (result.success) {
         setSubscribed(true);
         setShowOtpField(false);
+        setVerificationSent(false);
         localStorage.setItem('smsAlertPhone', phoneNumber);
       } else {
         setError(result.error || 'Failed to verify code');
+        setShowOtpField(true);
       }
     } catch (err) {
       setError('Failed to verify code. Please try again.');
+      setShowOtpField(true);
     } finally {
       setLoading(false);
+      setOtp('');
     }
   };
 
