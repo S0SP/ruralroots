@@ -104,7 +104,20 @@ app.post('/.netlify/functions/sms/verify-and-subscribe', async (req, res) => {
 
     if (verification_check.status === 'approved') {
       console.log('OTP verified successfully');
-      // Here you can add subscription logic for the location
+      
+      // Send welcome message
+      try {
+        await client.messages.create({
+          body: `Welcome to Rural Root Connect! 🌱\n\nYou are now subscribed to receive:\n- Weather alerts ⛈️\n- Soil condition updates 🌿\n- Disease detection alerts 🔍\n\nWe'll keep you informed about your farm's conditions.`,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: phoneNumber
+        });
+        console.log('Welcome message sent successfully');
+      } catch (msgError) {
+        console.error('Error sending welcome message:', msgError);
+        // Continue even if welcome message fails
+      }
+
       res.json({ 
         success: true,
         message: 'Phone number verified and subscribed successfully'
