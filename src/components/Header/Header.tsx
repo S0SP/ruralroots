@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import logoImage from '../../assets/images/logo.png';
+import { useAuth } from '../../contexts/AuthContext';
+import { useState, useRef, useEffect } from 'react';
 
 // Create a wrapper to provide consistent spacing for content
 export const HeaderSpacing = styled.div`
@@ -123,40 +125,136 @@ const IconWrapper = styled.div`
 
 const pages = ['Home', 'Services', 'Community' ,'FarmDashboard' , 'SchemesPage'];
 
+// Add these styled components
+const UserMenuDropdown = styled.div<{ isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 0.5rem 0;
+  display: ${props => props.isOpen ? 'block' : 'none'};
+  min-width: 200px;
+`;
+
+const MenuItem = styled.div`
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+`;
+
 const Header: React.FC = () => {
+  const { user, signInWithGoogle, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleAvatarClick = () => {
+    if (user) {
+      setIsMenuOpen(!isMenuOpen);
+    } else {
+      signInWithGoogle();
+    }
+  };
+
+  // Update IconsContainer section
   return (
-    <>
-      <HeaderContainer>
-        <LogoContainer to="/">
-          <Logo src={logoImage} alt="RealRoots Logo" />
-        </LogoContainer>
-        
-        <Navigation>
-          <NavLinks>
-            {pages.map((page) => (
-              <NavItem key={page}>
-                <StyledLink to={page === 'Home' ? '/' : `/${page.toLowerCase()}`}>
-                  {page}
-                </StyledLink>
-              </NavItem>
-            ))}
-            <NavItem>
-              <StyledLink to="/aitools">AITools</StyledLink>
+    <HeaderContainer>
+      <LogoContainer to="/">
+        <Logo src={logoImage} alt="RealRoots Logo" />
+      </LogoContainer>
+      
+      <Navigation>
+        <NavLinks>
+          {pages.map((page) => (
+            <NavItem key={page}>
+              <StyledLink to={page === 'Home' ? '/' : `/${page.toLowerCase()}`}>
+                {page}
+              </StyledLink>
             </NavItem>
-            <IconsContainer>
-              <IconWrapper>
-                <SearchIcon />
-              </IconWrapper>
-              <IconWrapper>
-                <AccountCircleIcon />
-              </IconWrapper>
-            </IconsContainer>
-          </NavLinks>
-        </Navigation>
-      </HeaderContainer>
-      <HeaderSpacing />
-    </>
+          ))}
+          <NavItem>
+            <StyledLink to="/aitools">AITools</StyledLink>
+          </NavItem>
+          <IconsContainer>
+            <IconWrapper>
+              <SearchIcon />
+            </IconWrapper>
+            <IconWrapper ref={menuRef} style={{ position: 'relative' }}>
+              {user ? (
+                <>
+                  <img
+                    src={user.photoURL || '/default-avatar.png'}
+                    alt="Profile"
+                    style={{ width: '24px', height: '24px', borderRadius: '50%' }}
+                    onClick={handleAvatarClick}
+                  />
+                  <UserMenuDropdown isOpen={isMenuOpen}>
+                    <MenuItem>
+                      <img
+                        src={user.photoURL || '/default-avatar.png'}
+                        alt="Profile"
+                        style={{ width: '32px', height: '32px', borderRadius: '50%' }}
+                      />
+                      <div>
+                        <div>{user.displayName}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#666' }}>{user.email}</div>
+                      </div>
+                    </MenuItem>
+                    <MenuItem onClick={logout}>Sign Out</MenuItem>
+                  </UserMenuDropdown>
+                </>
+              ) : (
+                <AccountCircleIcon onClick={handleAvatarClick} />
+              )}
+            </IconWrapper>
+          </IconsContainer>
+        </NavLinks>
+      </Navigation>
+    </HeaderContainer>
   );
 };
 
-export default Header; 
+export default Header;
+
+// Add these styled components if you don't have them
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const Avatar = styled.img`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const UserName = styled.span`
+  font-size: 14px;
+  color: #333;
+  margin-left: 8px;
+`;

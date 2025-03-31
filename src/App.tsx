@@ -8,6 +8,8 @@ import Community from './pages/Community';
 import DiseaseDetection from './components/DiseaseDetection/DiseaseDetection';
 import FarmDashboard from './pages/FarmDashboard';
 import Schemes from './pages/SchemesPage';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -28,21 +30,43 @@ const AITools = () => {
 
 function App() {
   return (
-    <Router>
-      <AppContainer>
-        <Header />
-        <ContentContainer>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/FarmDashboard" element={<FarmDashboard />} />
-            <Route path="/SchemesPage" element={<Schemes />} />
-            <Route path="/aitools" element={<AITools />} />
-          </Routes>
-        </ContentContainer>
-      </AppContainer>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContainer>
+          <Header />
+          <ContentContainer>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/services" element={
+                <ProtectedRoute>
+                  <Services />
+                </ProtectedRoute>
+              } />
+              <Route path="/community" element={
+                <ProtectedRoute>
+                  <Community />
+                </ProtectedRoute>
+              } />
+              <Route path="/farmdashboard" element={
+                <ProtectedRoute>
+                  <FarmDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/schemespage" element={
+                <ProtectedRoute>
+                  <Schemes />
+                </ProtectedRoute>
+              } />
+              <Route path="/aitools" element={
+                <ProtectedRoute>
+                  <AITools />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </ContentContainer>
+        </AppContainer>
+      </Router>
+    </AuthProvider>
   );
 }
 

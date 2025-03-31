@@ -97,25 +97,36 @@ app.post('/.netlify/functions/sms/verify-and-subscribe', async (req, res) => {
       process.env.TWILIO_AUTH_TOKEN
     );
 
+    // Log Twilio configuration
+    console.log('Twilio Config:', {
+      hasSID: !!process.env.TWILIO_ACCOUNT_SID,
+      hasToken: !!process.env.TWILIO_AUTH_TOKEN,
+      hasPhone: !!process.env.TWILIO_PHONE_NUMBER
+    });
+
     console.log('Attempting to verify OTP');
     const verification_check = await client.verify.v2
       .services(process.env.TWILIO_VERIFICATION_SERVICE_SID)
       .verificationChecks.create({ to: phoneNumber, code: otp });
 
     if (verification_check.status === 'approved') {
-      console.log('OTP verified successfully');
+      console.log('OTP verified successfully, sending welcome message');
       
-      // Send welcome message
       try {
-        await client.messages.create({
+        // Send welcome message
+        const message = await client.messages.create({
           body: `Welcome to Rural Root Connect! 🌱\n\nYou are now subscribed to receive:\n- Weather alerts ⛈️\n- Soil condition updates 🌿\n- Disease detection alerts 🔍\n\nWe'll keep you informed about your farm's conditions.`,
           from: process.env.TWILIO_PHONE_NUMBER,
           to: phoneNumber
         });
-        console.log('Welcome message sent successfully');
+        
+        console.log('Welcome message sent successfully:', message.sid);
       } catch (msgError) {
-        console.error('Error sending welcome message:', msgError);
-        // Continue even if welcome message fails
+        console.error('Error sending welcome message:', {
+          error: msgError.message,
+          code: msgError.code,
+          status: msgError.status
+        });
       }
 
       res.json({ 

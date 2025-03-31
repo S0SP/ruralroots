@@ -79,7 +79,8 @@ export const sendVerificationCode = async (phoneNumber: string): Promise<{ succe
 export const verifyOtpAndSubscribe = async (
   phoneNumber: string,
   otp: string,
-  location: { lat: number; lng: number }
+  location: { lat: number; lng: number },
+  userId: string
 ): Promise<{ success: boolean; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
@@ -90,7 +91,7 @@ export const verifyOtpAndSubscribe = async (
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({ phoneNumber, otp, location }),
+      body: JSON.stringify({ phoneNumber, otp, location, userId }),
       credentials: 'same-origin'
     });
     if (!response.ok) {
