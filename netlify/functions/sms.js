@@ -45,18 +45,22 @@ app.post('/.netlify/functions/sms/send-verification', async (req, res) => {
     }
 
     console.log('Processing phone number:', phoneNumber);
-    console.log('Twilio credentials check:', {
-      hasSID: !!process.env.TWILIO_ACCOUNT_SID,
-      hasToken: !!process.env.TWILIO_AUTH_TOKEN,
-      hasServiceSID: !!process.env.TWILIO_VERIFICATION_SERVICE_SID
-    });
+    
+    // Check Twilio credentials
+    if (!process.env.TWILIO_VERIFICATION_SERVICE_SID) {
+      console.error('Missing Twilio Verification Service SID');
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Twilio service not properly configured' 
+      });
+    }
 
     const client = twilio(
       process.env.TWILIO_ACCOUNT_SID,
       process.env.TWILIO_AUTH_TOKEN
     );
 
-    console.log('Attempting Twilio verification');
+    console.log('Attempting Twilio verification with service:', process.env.TWILIO_VERIFICATION_SERVICE_SID);
     const verification = await client.verify.v2
       .services(process.env.TWILIO_VERIFICATION_SERVICE_SID)
       .verifications.create({ to: phoneNumber, channel: 'sms' });
