@@ -83,12 +83,15 @@ export const verifyOtpAndSubscribe = async (
 ): Promise<{ success: boolean; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    const url = new URL('/.netlify/functions/api/sms/verify-and-subscribe', API_BASE_URL).toString();
+    const url = new URL('/.netlify/functions/sms/verify-and-subscribe', API_BASE_URL.replace(/\/$/, '')).toString();
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify({ phoneNumber, otp, location }),
-      credentials: 'include'
+      credentials: 'same-origin'
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Failed to verify OTP' }));
