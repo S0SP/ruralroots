@@ -31,7 +31,8 @@ if (!API_BASE_URL) {
 export const sendVerificationCode = async (phoneNumber: string): Promise<{ success: boolean; sid?: string; error?: string }> => {
   if (!API_BASE_URL) return { success: false, error: 'API URL not configured' };
   try {
-    const url = new URL('/api/sms/send-verification', API_BASE_URL).toString();
+    // In sendVerificationCode function
+    const url = new URL('/api/sms/send-verification', API_BASE_URL.replace(/\/$/, '')).toString();
     console.log(`Sending verification to: ${url}`);
     
     const response = await fetch(url, {

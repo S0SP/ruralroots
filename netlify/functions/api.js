@@ -4,6 +4,7 @@ const cors = require('cors');
 const twilio = require('twilio');
 
 const app = express();
+const router = express.Router();  // Add router
 
 // Add more detailed CORS configuration
 app.use(cors({
@@ -12,9 +13,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// SMS verification endpoint
-app.post('/sms/send-verification', async (req, res) => {
-  console.log('Received verification request:', req.body); // Add logging
+// Move routes to router
+router.post('/sms/send-verification', async (req, res) => {
+  console.log('Received verification request:', req.body);
   try {
     const { phoneNumber } = req.body;
     if (!phoneNumber) {
@@ -59,9 +60,18 @@ app.post('/sms/send-verification', async (req, res) => {
   }
 });
 
-// Add a test endpoint
-app.get('/test', (req, res) => {
+// Test endpoint on router
+router.get('/test', (req, res) => {
   res.json({ message: 'API is working' });
 });
 
+// Mount router at /
+app.use('/', router);
+
+// Add base route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'Base API endpoint' });
+});
+
+// Export the serverless function
 module.exports.handler = serverless(app);
