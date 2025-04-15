@@ -43,24 +43,24 @@ function App() {
                 
               } />
               <Route path="/community" element={
-                <ProtectedRoute>
+                
                   <Community />
-                </ProtectedRoute>
+                
               } />
               <Route path="/farmdashboard" element={
-                <ProtectedRoute>
+               
                   <FarmDashboard />
-                </ProtectedRoute>
+                
               } />
               <Route path="/schemespage" element={
-                <ProtectedRoute>
+                
                   <Schemes />
-                </ProtectedRoute>
+                
               } />
               <Route path="/aitools" element={
-                <ProtectedRoute>
+                
                   <AITools />
-                </ProtectedRoute>
+                
               } />
             </Routes>
           </ContentContainer>
