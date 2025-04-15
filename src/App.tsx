@@ -38,9 +38,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/services" element={
-                <ProtectedRoute>
+                
                   <Services />
-                </ProtectedRoute>
+                
               } />
               <Route path="/community" element={
                 <ProtectedRoute>
