@@ -59,7 +59,7 @@ export async function analyzeImage(
     console.log('Starting image analysis for type:', type);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash"
+      model: "gemini-2.5-flash"
     });
 
     const prompt = `Analyze this ${type} image and provide a detailed, structured analysis. Be very specific and consistent in your response. Use exactly this format:
